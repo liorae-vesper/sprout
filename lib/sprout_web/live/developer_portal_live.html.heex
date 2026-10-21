@@ -1,0 +1,186 @@
+<Layouts.app flash={@flash}>
+  <div class="developer-portal">
+    <header class="developer-header">
+      <a href={~p"/"} class="brand"><span class="brand-icon">🌱</span>sprout<span class="brand-dot">.</span><small>for builders</small></a>
+      <nav aria-label="Developer navigation">
+        <a href="#quickstart">Quickstart</a><a href="#credentials">Integrations</a><a href={
+          ~p"/api/openapi.json"
+        }>OpenAPI ↗</a><a href={~p"/"} class="secondary-button">Back to the farm →</a>
+      </nav>
+    </header>
+    <main class="developer-main">
+      <section class="developer-hero">
+        <div>
+          <span class="pill">🌿 THE SPROUT DEVELOPER GARDEN</span><h1>
+            Plant an integration.<br />Watch it grow.
+          </h1><p>
+            Connect your sensors, bring your tools, and help your farm flourish.<br />A small, thoughtful API for a very lively little world.
+          </p><div class="developer-hero-actions">
+            <a href="#credentials" class="primary-button">＋ Create an integration</a><a
+              href={~p"/api/openapi.json"}
+              class="text-button"
+            >Explore the API contract ↗</a>
+          </div>
+        </div>
+        <div class="developer-art" aria-hidden="true">
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><span class="integration-leaf">🌱</span><span class="connection-node node-water">💧</span><span class="connection-node node-sun">☀</span><span class="connection-node node-code">&lt;/&gt;</span><span class="connection-node node-flower">🌼</span><span class="connection-caption">A little connection.<br />A whole lot of possibility.</span>
+        </div>
+      </section>
+      <div class="developer-beta">
+        <span>✦ PRIVATE BETA</span><p>
+          Trusted operator console · keys grant access to this farm only. This management page requires your local or private access boundary; it has no individual user login.
+        </p><span class="api-version">API v1</span>
+      </div>
+      <section id="quickstart" class="developer-steps">
+        <article>
+          <span>01</span><h2>Give it a name</h2><p>
+            A weather station, a research tool, a tiny side project. Every connection gets its own key.
+          </p>
+        </article><article>
+          <span>02</span><h2>Choose its patch</h2><p>
+            Grant specific fields and just the capabilities your integration needs.
+          </p>
+        </article><article>
+          <span>03</span><h2>Send a little life</h2><p>
+            Submit a sensor reading. The farm dashboard updates when it’s saved.
+          </p>
+        </article>
+      </section>
+      <div :if={@notice} id="portal-notice" class="notice" role="status">🌱 {@notice}</div>
+      <section :if={@new_secret} class="new-key-panel" aria-label="Your new API key">
+        <span>🔑</span><div>
+          <h2>Your key, fresh from the garden.</h2><p>
+            Copy it now. We store only its fingerprint and cannot show it again. It expires in 90 days.
+          </p><code id="new-api-key">{@new_secret}</code><button
+            id="dismiss-key"
+            phx-click="dismiss-key"
+            class="secondary-button"
+          >I saved my key ✓</button>
+        </div>
+      </section>
+      <section id="credentials" class="developer-grid">
+        <article class="panel developer-create">
+          <p class="eyebrow">MAKE ROOM FOR SOMETHING NEW</p><h2>
+            A new connection <span>🌼</span>
+          </h2><p class="panel-intro">One key. A clear purpose. Only the access it needs.</p><.form
+            for={@form}
+            id="integration-form"
+            phx-submit="create-client"
+          >
+            <.input
+              field={@form[:name]}
+              label="Integration name"
+              placeholder="My little weather station"
+              class="farm-input"
+              required
+              minlength="2"
+              maxlength="100"
+            /><.input
+              field={@form[:field_ids]}
+              type="select"
+              multiple
+              label="Fields it can access"
+              options={@field_options}
+              class="farm-input portal-multi"
+              required
+            /><.input
+              field={@form[:scopes]}
+              type="select"
+              multiple
+              label="Capabilities"
+              options={[
+                {"Read field details", "fields:read"},
+                {"Read recent sensor data", "readings:read"},
+                {"Send device readings", "readings:write"}
+              ]}
+              class="farm-input portal-multi"
+              required
+            /><p class="portal-help">
+              Hold Ctrl / Cmd to select more than one. Keys expire after 90 days.
+            </p><button class="primary-button" type="submit" disabled={!@has_fields}>Create integration →</button><p
+              :if={!@has_fields}
+              class="portal-help"
+            >
+              Add a field on your farm before issuing a key.
+            </p>
+          </.form>
+        </article>
+        <article class="panel developer-clients">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">YOUR CONNECTED LITTLE WORLD</p><h2>Growing connections</h2>
+            </div><span class="soft-tag">{@client_count} integrations</span>
+          </div><div id="integration-clients" phx-update="stream">
+            <div :if={@client_count == 0} id="clients-empty" class="portal-empty">
+              <span>🌿</span><h3>A lovely place to start.</h3><p>
+                Your first connection is waiting to put down roots.
+              </p>
+            </div><article
+              :for={{dom_id, client} <- @streams.clients}
+              id={dom_id}
+              class="integration-client"
+            >
+              <div class="client-title">
+                <strong>{client.name}</strong><span class={"client-status status-#{String.downcase(status(client))}"}>{status(
+                  client
+                )}</span>
+              </div><code>{client.token_prefix}…</code><p>
+                {Enum.map_join(client.fields, " · ", & &1.name)}
+              </p><div class="scope-tags"><span :for={scope <- client.scopes}>{scope}</span></div><div class="client-footer">
+                <small>Expires {Calendar.strftime(client.expires_at, "%b %d, %Y")}</small><button
+                  :if={status(client) == "Active"}
+                  id={"revoke-client-#{client.id}"}
+                  class="revoke-button"
+                  phx-click="revoke-client"
+                  phx-value-id={client.id}
+                >Revoke key</button>
+              </div>
+            </article>
+          </div>
+        </article>
+      </section>
+      <section class="developer-examples">
+        <div class="section-heading">
+          <div>
+            <h2>A first little hello <span>👋</span></h2><p>
+              Set SPROUT_API_KEY in your shell. Keep it out of source control.
+            </p>
+          </div><span class="soft-tag">JSON over HTTP</span>
+        </div><div class="example-grid">
+          <article>
+            <div class="code-title">
+              <span class="method method-get">GET</span><strong>Your fields</strong><small>fields:read</small>
+            </div><pre><code>{list_example(@api_base)}</code></pre><p>
+              The response contains only the fields granted to your key.
+            </p>
+          </article><article>
+            <div class="code-title">
+              <span class="method method-post">POST</span><strong>A sensor reading</strong><small>readings:write</small>
+            </div><pre><code>{write_example(@api_base)}</code></pre><p>
+              Set FIELD_ID to a granted field. Use a unique key for each sample; reuse it only when retrying the same payload.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="developer-reference panel">
+        <div>
+          <span class="eyebrow">SMALL CONTRACT. CLEAR EXPECTATIONS.</span><h2>
+            Everything you need to connect.
+          </h2><p>
+            Download the OpenAPI contract for schemas, scopes, units, and error responses.
+          </p>
+        </div><a href={~p"/api/openapi.json"} class="secondary-button">Open API specification ↗</a>
+      </section>
+      <div class="api-facts">
+        <p>
+          💧 Moisture & humidity in percent · 🌡 Temperature in °C · 🚿 Water in liters per interval
+        </p><p>
+          201 new sample · 200 replay · 401 invalid key · 403 missing scope · 404 unavailable field · 409 retry conflict · 422 invalid data
+        </p>
+      </div>
+      <footer>
+        Built for curious minds & thriving fields.<span>🌱 Sprout · A little more connected.</span>
+      </footer>
+    </main>
+  </div>
+</Layouts.app>

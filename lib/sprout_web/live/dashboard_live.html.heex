@@ -1,0 +1,686 @@
+<Layouts.app flash={@flash}>
+  <div class="farm-app">
+    <aside class="sidebar">
+      <a href="/" class="brand"><span class="brand-icon">🌱</span>sprout<span class="brand-dot">.</span></a>
+      <div class="farm-switch">
+        <span>🏡</span><div>
+          <strong>Clover & Co.</strong><small>A little farm with big dreams</small>
+        </div>
+      </div>
+      <p class="nav-label">YOUR FARM</p>
+      <nav aria-label="Farm navigation">
+        <button
+          class={if @tab == "overview", do: "nav-item active", else: "nav-item"}
+          phx-click="tab"
+          phx-value-tab="overview"
+        ><span>▦</span> Farm overview <span class="nav-end">✦</span></button>
+        <button
+          class={if @tab == "equipment", do: "nav-item active", else: "nav-item"}
+          phx-click="tab"
+          phx-value-tab="equipment"
+        ><span>⚒</span> Equipment <span class="count">{@asset_count}</span></button>
+        <button
+          class={if @tab == "photos", do: "nav-item active", else: "nav-item"}
+          phx-click="tab"
+          phx-value-tab="photos"
+        ><span>▧</span> Plant journal</button>
+        <a href="#land-map" class="nav-item"><span>⌖</span> Land &amp; boundaries</a>
+        <a href={~p"/developers"} class="nav-item"><span>⌘</span> Developer garden</a>
+      </nav>
+      <div class="sidebar-note">
+        <span>🐝</span><strong>Good things take thyme.</strong><p>
+          A little care today.<br />A happier harvest tomorrow.
+        </p><div class="tiny-flowers">✿ · ✿ · ✿</div>
+      </div>
+      <div class="engine">
+        <span class="engine-dot"></span><div>
+          Rooted in Elixir<small>Phoenix LiveView · PostgreSQL</small>
+        </div>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div>
+          <span class="crumb">Your farm</span><span class="slash">/</span>{case @tab do
+            "equipment" -> "Equipment"
+            "photos" -> "Plant journal"
+            _ -> "Overview"
+          end}
+        </div><div class="top-right">
+          <span class="demo-badge">✦ DEMO FARM</span><span class="avatar">JD</span>
+        </div>
+      </header>
+      <div class="page-content">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">A LITTLE CLOSER TO YOUR FARM</p><h1>
+              Little things. Growing beautifully.<span>🌼</span>
+            </h1><p class="subheading">
+              Your fields, your harvest, and everything that helps them flourish.
+            </p>
+          </div><span class="date-chip">☀ {Calendar.strftime(Date.utc_today(), "%b %d, %Y")}</span>
+        </div>
+        <div :if={@notice} class="notice" role="status">🌱 {@notice}</div>
+        <section class="welcome-banner">
+          <div class="welcome-copy">
+            <span class="pill">🌿 GROWING TOGETHER</span><h2>
+              A happy farm starts<br />with a little attention.
+            </h2><p>
+              There’s a whole lot of life out there.<br />Let’s see how your little world is doing.
+            </p><span class="live-status"><i></i>
+            Live field updates · readings refresh as they arrive</span>
+          </div>
+          <svg
+            class="farm-art"
+            viewBox="0 0 640 290"
+            role="img"
+            aria-label="A cheerful illustrated farm with rolling fields, a barn, and a smiling sun"
+          >
+            <defs>
+              <pattern
+                id="rows"
+                width="24"
+                height="24"
+                patternTransform="rotate(-30)"
+                patternUnits="userSpaceOnUse"
+              >
+                <path d="M0 0V24" stroke="#d9c991" stroke-width="9" />
+              </pattern><pattern id="plants" width="34" height="30" patternUnits="userSpaceOnUse">
+                <path
+                  d="M17 25v-12m0 7q-16-1-10-12 10 0 10 12m0-4q12-1 10-11-11 0-10 11"
+                  fill="#648f61"
+                  stroke="#648f61"
+                  stroke-width="2"
+                />
+              </pattern>
+            </defs>
+            <circle cx="490" cy="62" r="32" fill="#f7d572" /><g
+              stroke="#e7be5e"
+              stroke-width="3"
+              stroke-linecap="round"
+            >
+              <path d="M490 16V9m0 106v-7m46-46h8m-108 0h-8m95-33 6-6m-78 78-6 6m78-6 6 6m-78-78-6-6" />
+            </g><path
+              d="M479 64q4 4 7 0m9 0q4 4 7 0m-15 10q5 5 10 0"
+              fill="none"
+              stroke="#a4853f"
+              stroke-width="2"
+            /><path d="M0 176Q110 75 270 158T640 140V290H0" fill="#b2cbaa" /><path
+              d="M0 213Q160 120 340 192T640 165V290H0"
+              fill="#90b38a"
+            /><path d="M0 266 234 184 387 247 240 290H0" fill="#e5d9ad" /><path
+              d="M0 266 234 184 387 247 240 290H0"
+              fill="url(#rows)"
+            /><path d="m375 192 265 50v48H395l-92-36Z" fill="#bad09c" /><path
+              d="m375 192 265 50v48H395l-92-36Z"
+              fill="url(#plants)"
+            /><path d="m0 290 320-97 36 10-273 87" fill="#f5ead1" /><g transform="translate(274 100)">
+              <path d="M0 56 51 15l52 41v68H0" fill="#cf8169" /><path
+                d="m-12 58 63-51 64 51"
+                fill="none"
+                stroke="#687a65"
+                stroke-width="12"
+                stroke-linejoin="round"
+              /><path d="M30 77h42v47H30" fill="#f8e6c4" /><path
+                d="m32 79 38 43m0-43-38 43M51 79v45"
+                stroke="#bb8066"
+                stroke-width="3"
+              /><rect x="40" y="42" width="23" height="20" rx="3" fill="#f7e4bc" /><path
+                d="M51 42v20m-11-10h23"
+                stroke="#bb8066"
+                stroke-width="2"
+              />
+            </g><g fill="#729566">
+              <circle cx="174" cy="133" r="29" /><circle cx="150" cy="146" r="24" /><circle
+                cx="190"
+                cy="151"
+                r="22"
+              />
+            </g><path d="M171 152v49" stroke="#a28b67" stroke-width="9" /><g
+              stroke="#f3e7c9"
+              stroke-width="6"
+            >
+              <path d="M408 174v48m36-42v48m36-41v48m36-41v48m-115-48 126 23m-126-7 126 23" />
+            </g><g fill="#fff7df">
+              <ellipse cx="87" cy="70" rx="29" ry="10" /><ellipse
+                cx="106"
+                cy="64"
+                rx="19"
+                ry="15"
+              /><ellipse
+                cx="125"
+                cy="72"
+                rx="23"
+                ry="8"
+              /><ellipse cx="362" cy="39" rx="25" ry="8" /><ellipse
+                cx="379"
+                cy="33"
+                rx="16"
+                ry="12"
+              />
+            </g><g fill="#f7d879">
+              <circle cx="203" cy="254" r="5" /><circle cx="215" cy="268" r="4" /><circle
+                cx="560"
+                cy="268"
+                r="4"
+              />
+            </g>
+          </svg>
+        </section>
+        <section class="stats" aria-label="Farm summary">
+          <article>
+            <div class="stat-icon mint">▧</div><div>
+              <p>Room to grow</p><strong>{number(@land_area)} <small>ha</small></strong><span>Across {@parcel_count} land parcels · {@field_count} plots</span>
+            </div>
+          </article><article>
+            <div class="stat-icon peach">♧</div><div>
+              <p>Growing right now</p><strong>{@active_crop_count}
+              <small>crop cycles</small></strong><span>From tiny seeds to big things</span>
+            </div>
+          </article><article>
+            <div class="stat-icon butter">☀</div><div>
+              <p>Harvest outlook</p><strong>{number(@total_yield / 1000)} <small>tonnes</small></strong><span>Experimental · live inputs</span>
+            </div>
+          </article><article>
+            <div class="stat-icon lilac">♡</div><div>
+              <p>A little attention</p><strong>{@open_findings} <small>open findings</small></strong><span>Scouting keeps us growing</span>
+            </div>
+          </article>
+        </section>
+        <div :if={@field_count == 0} class="panel empty">
+          <h2>Your farm is ready to sprout 🌱</h2><p>
+            Add your first land parcel below, then draw a growing plot inside it.
+          </p>
+        </div>
+        <div :if={@selected}>
+          <section class="fields-section">
+            <div class="section-heading">
+              <div>
+                <h2>Your little patches <span>🌱</span></h2><p>
+                  A bird’s-eye view of what’s putting down roots.
+                </p>
+              </div><span class="muted-label">{@field_count} PLOTS · SELECT TO EXPLORE</span>
+            </div><div class="field-cards" id="field-cards" phx-update="stream">
+              <button
+                :for={{dom_id, card} <- @streams.field_cards}
+                id={dom_id}
+                class={"field-card field-#{rem(card.index,4)} #{if card.field.id == @selected_id, do: "selected", else: ""}"}
+                phx-click="select"
+                phx-value-id={card.field.id}
+              ><div class="field-card-top">
+                <span class="crop-emoji">{crop_icon(card.index)}</span><span class="field-pill">{if card.crop,
+                  do: card.crop.status,
+                  else: card.field.soil_status}</span>
+              </div><h3>{card.field.name}</h3><p>
+                {if card.crop,
+                  do: card.crop.name <> " · " <> card.crop.variety,
+                  else: "Soil · #{card.field.soil_status}"}
+              </p><div class="field-bottom">
+                <span>{number(card.field.area_ha)} ha</span><span>◉ {if card.reading,
+                  do: "#{number(card.reading.moisture)}% moisture",
+                  else: "No readings"}</span>
+              </div></button>
+            </div>
+          </section>
+          <div :if={@tab == "overview"} class="detail-grid">
+            <section class="panel sensor-panel">
+              <div class="panel-heading">
+                <div>
+                  <span class="eyebrow">A PULSE ON YOUR PATCH</span><h2>{@selected.name}</h2>
+                </div><span class="live-dot"><i></i> {freshness(@current.reading)}</span>
+              </div><div class="sensor-values">
+                <div>
+                  <span>💧 Soil moisture</span><strong>{if @current.reading,
+                    do: number(@current.reading.moisture),
+                    else: "—"}<small>%</small></strong>
+                </div><div>
+                  <span>🌡 Temperature</span><strong>{if @current.reading,
+                    do: number(@current.reading.temperature),
+                    else: "—"}<small>°C</small></strong>
+                </div><div>
+                  <span>☁ Humidity</span><strong>{if @current.reading,
+                    do: number(@current.reading.humidity),
+                    else: "—"}<small>%</small></strong>
+                </div><div>
+                  <span>🚿 Water / interval</span><strong>{if @current.reading,
+                    do: number(@current.reading.water_l),
+                    else: "—"}<small>L</small></strong>
+                </div>
+              </div><div class="chart-label">
+                <span>SOIL MOISTURE</span><span>Latest {length(@history)} readings</span>
+              </div><svg
+                class="sensor-chart"
+                viewBox="0 0 290 105"
+                preserveAspectRatio="none"
+                role="img"
+                aria-label="Recent soil moisture readings"
+              ><path d="M0 20h290M0 50h290M0 80h290" stroke="#e8ece3" stroke-dasharray="3 3" /><polyline
+                points={sparkline(@history)}
+                fill="none"
+                stroke="#719979"
+                stroke-width="2.5"
+                vector-effect="non-scaling-stroke"
+              /></svg><div class="chart-footer"><span>Earlier</span><span>Just now</span></div><div
+                :if={@current.estimate}
+                class="estimate"
+              >
+                <div>
+                  <span>🌾 Experimental harvest outlook</span><strong>{number(
+                    if(@current.estimate.kg, do: @current.estimate.kg / 1000, else: nil)
+                  )} tonnes</strong>
+                </div><p>
+                  Baseline × area × water × temperature × field health.<br />Confidence: {@current.estimate.confidence}. This is a heuristic, not an agronomic forecast.
+                </p><button class="text-button" phx-click="crop">Record harvest →</button>
+              </div>
+              <div class="soil-workflow" id="soil-workflow">
+                <h3>Soil · {@selected.soil_status}</h3>
+                <p :if={@current.crop}>
+                  Occupied by {@current.crop.name}. Harvest before preparing the next cycle.
+                </p>
+                <div :if={is_nil(@current.crop)} class="map-toolbar">
+                  <button
+                    :if={@selected.soil_status == :resting}
+                    id="plot-prepare"
+                    class="secondary-button"
+                    phx-click="plot-state"
+                    phx-value-status="preparing"
+                  >Begin preparation →</button>
+                  <button
+                    :if={@selected.soil_status == :preparing}
+                    id="plot-ready"
+                    class="primary-button"
+                    phx-click="plot-state"
+                    phx-value-status="ready"
+                  >Soil is ready →</button>
+                  <button
+                    :if={@selected.soil_status != :resting}
+                    class="secondary-button"
+                    phx-click="plot-state"
+                    phx-value-status="resting"
+                  >Let the land rest</button>
+                </div>
+              </div>
+              <div :if={@next_cycle} class="next-cycle" id="next-cycle">
+                <span class="eyebrow">NEXT CROP · PLANNED</span>
+                <h3>{@next_cycle.name} · {@next_cycle.variety}</h3>
+                <p>
+                  Planned planting: {@next_cycle.planned_on}. Planning does not occupy this plot.
+                </p>
+                <button
+                  :if={is_nil(@current.crop) and @selected.soil_status == :ready}
+                  id="cycle-plant"
+                  class="primary-button"
+                  phx-click="cycle"
+                  phx-value-target="growing"
+                >Mark planted →</button>
+                <button
+                  id="cycle-cancel"
+                  class="text-button"
+                  phx-click="cycle"
+                  phx-value-target="cancelled"
+                >Cancel plan</button>
+              </div>
+              <div :if={is_nil(@next_cycle)} class="crop-intake">
+                <h3>A fresh start 🌱</h3><p>Plan the next crop for this patch.</p><.form
+                  for={@crop_form}
+                  id="crop-form"
+                  phx-submit="crop-create"
+                >
+                  <div class="form-row">
+                    <.input
+                      field={@crop_form[:name]}
+                      label="Crop"
+                      type="text"
+                      class="farm-input"
+                      placeholder="Mint"
+                      required
+                    /><.input
+                      field={@crop_form[:variety]}
+                      label="Variety"
+                      type="text"
+                      class="farm-input"
+                      placeholder="Spearmint"
+                      required
+                    />
+                  </div><div class="form-row">
+                    <.input
+                      field={@crop_form[:baseline_kg_ha]}
+                      label="Baseline yield · kg / ha"
+                      type="number"
+                      class="farm-input"
+                      min="1"
+                      step="any"
+                      required
+                    /><.input
+                      field={@crop_form[:planned_on]}
+                      label="Planned planting date"
+                      type="date"
+                      class="farm-input"
+                      required
+                    />
+                  </div><button class="primary-button">Plan crop →</button>
+                </.form>
+              </div>
+              <details class="cycle-history">
+                <summary>Crop cycle history</summary><div id="cycle-history" phx-update="stream">
+                  <p :for={{id, cycle} <- @streams.cycles} id={id}>
+                    {cycle.name} · {cycle.status} · planned {cycle.planned_on}<span :if={
+                      cycle.planted_on
+                    }> · planted {cycle.planted_on}</span><span :if={cycle.harvested_on}> · harvested {cycle.harvested_on}</span>
+                  </p>
+                </div>
+              </details>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <span class="eyebrow">BOOTS ON THE GROUND</span><h2>
+                    Field notes <span>🐞</span>
+                  </h2>
+                </div><span class="soft-tag">Geofenced</span>
+              </div><p class="panel-intro">
+                Spotted something? A little note helps the whole field.
+              </p><.form for={@finding_form} id="finding-form" phx-submit="finding">
+                <div class="form-row">
+                  <.input
+                    field={@finding_form[:kind]}
+                    label="Finding"
+                    type="select"
+                    class="farm-input"
+                    options={[
+                      {"\n                  🐛 Pest pressure\n                ", "pest"},
+                      {"🍂 Disease signs", "disease"},
+                      {"\n                  🌱 Nutrition\n                ", "nutrition"}
+                    ]}
+                  /><.input
+                    field={@finding_form[:severity]}
+                    label="Severity"
+                    type="select"
+                    class="farm-input"
+                    options={[
+                      {"\n                  Low · 10%\n                ", "0.1"},
+                      {"Moderate · 20%", "0.2"},
+                      {"\n                  High · 50%\n                ", "0.5"}
+                    ]}
+                  />
+                </div><.input
+                  field={@finding_form[:notes]}
+                  label="What did you notice?"
+                  type="textarea"
+                  class="farm-input"
+                  placeholder="Aphids on a few lower leaves…"
+                  required
+                  minlength="3"
+                  maxlength="1000"
+                /><div class="form-row">
+                  <.input
+                    field={@finding_form[:latitude]}
+                    label="Latitude"
+                    type="number"
+                    class="farm-input"
+                    step="any"
+                    required
+                  /><.input
+                    field={@finding_form[:longitude]}
+                    label="Longitude"
+                    type="number"
+                    class="farm-input"
+                    step="any"
+                    required
+                  />
+                </div><button class="primary-button" type="submit">＋ Save field note</button>
+              </.form><div class="findings" id="findings" phx-update="stream">
+                <p :if={@findings_empty} id="findings-empty" class="empty-note">
+                  ✿ No findings yet. A lovely place to start.
+                </p><article :for={{dom_id, finding} <- @streams.findings} id={dom_id}>
+                  <div>
+                    <strong>{finding.notes}</strong><small>{finding.kind} · {round(
+                      finding.severity * 100
+                    )}% pressure · {finding.status}</small>
+                  </div><button
+                    :if={finding.status == :open}
+                    class="text-button"
+                    phx-click="resolve"
+                    phx-value-id={finding.id}
+                  >Resolve ✓</button>
+                </article>
+              </div>
+            </section>
+          </div>
+          <section :if={@tab == "equipment"} class="panel equipment-panel">
+            <div class="section-heading">
+              <div>
+                <h2>A helping hand ⚒</h2><p>Keep your hard-working tools in happy shape.</p>
+              </div>
+            </div><div id="equipment-list" phx-update="stream">
+              <div :for={{dom_id, asset} <- @streams.equipment} id={dom_id} class="asset-row">
+                <span class="asset-icon">{if asset.kind == :tractor, do: "🚜", else: "🛠"}</span><div>
+                  <strong>{asset.name}</strong><small>{asset.kind} · {Land.get_field!(
+                    asset.field_id
+                  ).name}</small>
+                </div><span class="soft-tag">{asset.status}</span><button
+                  class="secondary-button"
+                  phx-click="asset"
+                  phx-value-id={asset.id}
+                >{if asset.status == :ready, do: "Schedule maintenance", else: "Mark ready"}</button>
+              </div>
+            </div><details class="management-details">
+              <summary>＋ Add equipment to {@selected.name}</summary><.form
+                for={@asset_form}
+                id="asset-form"
+                phx-submit="asset-create"
+              >
+                <.input
+                  field={@asset_form[:name]}
+                  label="Name"
+                  type="text"
+                  class="farm-input"
+                  required
+                  maxlength="100"
+                /><div class="form-row">
+                  <.input
+                    field={@asset_form[:kind]}
+                    label="Type"
+                    type="select"
+                    class="farm-input"
+                    options={[
+                      {"Pump", "pump"},
+                      {"\n                  Tractor\n                ", "tractor"},
+                      {"Sensor", "sensor"},
+                      {"Tool", "tool"}
+                    ]}
+                  /><.input
+                    field={@asset_form[:status]}
+                    label="Status"
+                    type="select"
+                    class="farm-input"
+                    options={[
+                      {"\n                  Ready\n                ", "ready"},
+                      {"Maintenance", "maintenance"},
+                      {"\n                  Offline\n                ", "offline"}
+                    ]}
+                  />
+                </div><button class="primary-button">Add equipment →</button>
+              </.form>
+            </details>
+          </section>
+          <section :if={@tab == "photos"} class="panel photo-panel">
+            <div class="section-heading">
+              <div>
+                <h2>A plant’s-eye view 📷</h2><p>
+                  Original images for {@selected.name}. A future model can pick up where you leave off.
+                </p>
+              </div><span class="soft-tag">Model not installed</span>
+            </div><.form
+              for={@photo_form}
+              id="photo-form"
+              phx-submit="upload"
+              phx-change="validate-photo"
+            >
+              <div class="upload-box">
+                <span>🌿</span><h3>A little snapshot of plant life</h3><p>
+                  PNG or JPEG · up to 8 MB · stored privately
+                </p><.live_file_input upload={@uploads.leaf} /><p :for={
+                  error <- upload_errors(@uploads.leaf)
+                }>
+                  {error}
+                </p><div :for={entry <- @uploads.leaf.entries}>
+                  <span>{entry.client_name} · {entry.progress}%</span><p :for={
+                    error <- upload_errors(@uploads.leaf, entry)
+                  }>
+                    {error}
+                  </p>
+                </div>
+              </div><button class="primary-button" type="submit">Preserve photo →</button>
+            </.form><div class="photo-list" id="photo-list" phx-update="stream">
+              <article :for={{dom_id, photo} <- @streams.photos} id={dom_id}>
+                <span>▧</span><div>
+                  <strong>{photo.filename}</strong><small>{photo.status} · SHA-256 {String.slice(
+                    photo.sha256,
+                    0,
+                    12
+                  )}…</small>
+                </div><span class="soft-tag">Original saved</span>
+              </article><p :if={@photos_empty} id="photos-empty" class="empty-note">
+                Your plant journal is waiting for its first leaf.
+              </p>
+            </div>
+          </section>
+          <section class="boundary-note">
+            <span>⌖</span><div>
+              <strong>A place for every plant</strong><p>
+                Field boundary · {length(@selected.boundary["points"])} GPS vertices · scouting notes must fall inside the polygon.
+              </p>
+            </div><code>{Enum.map_join(@selected.boundary["points"], " → ", fn [lat, lon] ->
+              "#{Float.round(lat / 1, 3)}, #{Float.round(lon / 1, 3)}"
+            end)}</code>
+          </section>
+        </div>
+        <section class="panel land-panel" aria-labelledby="land-heading">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">ROOTED IN A REAL PLACE</span><h2 id="land-heading">
+                Our little corner of the world 🌿
+              </h2>
+            </div>
+            <span class="soft-tag">GPS field boundaries</span>
+          </div>
+          <p class="panel-intro">
+            Dashed outlines show available land parcels. Green regions are growing plots. Register land first, then draw plots inside it. Demo boundaries are illustrative.
+          </p>
+          <div
+            id="land-map"
+            phx-hook="LandMap"
+            phx-update="ignore"
+            data-parcels={Jason.encode!(@map_parcels)}
+            data-fields={Jason.encode!(@map_fields)}
+            data-selected={@selected_id}
+          >
+            <div class="map-toolbar" role="group" aria-label="Map drawing controls">
+              <button type="button" class="primary-button" data-action="draw">＋ Draw a plot</button>
+              <button type="button" class="secondary-button" data-action="parcel">＋ Draw a land parcel</button>
+              <button type="button" class="secondary-button" data-action="undo" disabled>Undo point</button>
+              <button type="button" class="secondary-button" data-action="finish" disabled>Use boundary</button>
+              <button type="button" class="secondary-button" data-action="clear" disabled>Clear draft</button>
+              <button type="button" class="secondary-button" data-action="fit">Show all land</button>
+            </div>
+            <p class="map-status" role="status" aria-live="polite">
+              Pan and zoom to explore your land. Map tiles require internet.
+            </p>
+            <div
+              class="land-map-canvas"
+              role="region"
+              aria-label="Interactive map of field boundaries"
+            >
+            </div>
+          </div>
+          <p class="map-footnote">
+            Prefer precise coordinates or keyboard entry? Open “add a growing plot” below and paste GPS pairs. Basemap: OpenStreetMap. Boundaries remain visible if tiles are unavailable.
+          </p>
+        </section>
+        <div id="parcels" phx-update="stream" class="parcel-list">
+          <article :for={{id, parcel} <- @streams.parcels} id={id}>
+            <span>⌖</span><strong>{parcel.name}</strong><small>{number(parcel.area_ha)} ha available land</small>
+          </article>
+        </div>
+        <details class="management-details parcel-intake">
+          <summary>＋ Register land available to the farm · add a parcel</summary>
+          <.form for={@parcel_form} id="parcel-form" phx-submit="parcel-create">
+            <div class="form-row">
+              <.input
+                field={@parcel_form[:name]}
+                label="Parcel name"
+                required
+                maxlength="100"
+                class="farm-input"
+              /><.input
+                field={@parcel_form[:area_ha]}
+                label="Available land · hectares"
+                type="number"
+                min="0.0001"
+                step="any"
+                required
+                class="farm-input"
+              />
+            </div>
+            <.input
+              field={@parcel_form[:boundary]}
+              label="Parcel boundary · [latitude, longitude] pairs"
+              type="textarea"
+              required
+              class="farm-input"
+            />
+            <button class="primary-button">Register parcel →</button>
+          </.form>
+        </details>
+        <details class="management-details field-intake">
+          <summary>＋ A little patch to nurture · add a growing plot</summary><.form
+            for={@field_form}
+            id="field-form"
+            phx-submit="field-create"
+          >
+            <.input
+              field={@field_form[:parcel_id]}
+              label="Inside land parcel"
+              type="select"
+              prompt="Choose available land"
+              options={@parcel_options}
+              required
+              class="farm-input"
+            />
+            <div class="form-row">
+              <.input
+                field={@field_form[:name]}
+                label="Plot name"
+                type="text"
+                class="farm-input"
+                required
+                maxlength="100"
+                placeholder="Minty meadow"
+              /><.input
+                field={@field_form[:area_ha]}
+                label="Area · hectares"
+                type="number"
+                class="farm-input"
+                min="0.01"
+                step="any"
+                required
+              />
+            </div><.input
+              field={@field_form[:boundary]}
+              label="Boundary · GPS polygon as [latitude, longitude] pairs"
+              type="textarea"
+              class="farm-input"
+              required
+              placeholder="[[-23.551,-46.631],[-23.551,-46.629],[-23.549,-46.629],[-23.549,-46.631]]"
+            /><button class="primary-button">Create plot →</button>
+          </.form>
+        </details>
+        <footer>
+          Made for slow mornings & thriving fields.
+          <span>🌱 Sprout · Powered by Elixir & Phoenix LiveView</span>
+        </footer>
+      </div>
+    </main>
+  </div>
+</Layouts.app>
